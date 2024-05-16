@@ -222,3 +222,42 @@ fn upgrade_accounts_should_work() {
 			assert_eq!(System::consumers(&7), 0);
 		});
 }
+
+#[test]
+fn burn_works() {
+	ExtBuilder::default().build().execute_with(|| {
+		// Prepare account with initial balance
+		let (account, init_balance) = (1, 37);
+		assert_ok!(Balances::force_set_balance(RuntimeOrigin::root(), account, init_balance));
+		let init_issuance = Balances::total_issuance();
+
+		// 1. Cannot burn more than what's available
+		assert_noop!(
+			Balances::burn(Some(account).into(), init_balance + 1, true),
+			TokenError::FundsUnavailable,
+		);
+
+		// 2. Burn some funds, without reaping the account
+		let burn_amount_1 = 1;
+		assert_ok!(Balances::burn(Some(account).into(), burn_amount_1, true));
+		assert_eq!(Balances::total_issuance(), init_issuance - burn_amount_1);
+		assert_eq!(Balances::total_balance(&account), init_balance - burn_amount_1);
+
+		// 3. Cannot burn funds below existential deposit if `keep_alive` is `true`
+		let burn_amount_2 =
+			init_balance - burn_amount_1 - <Test as Config>::ExistentialDeposit::get() + 1;
+		assert_noop!(
+			Balances::burn(Some(account).into(), init_balance + 1, true),
+			TokenError::FundsUnavailable,
+		);
+
+		// 4. Burn some more funds, this time reaping the account
+		assert_ok!(Balances::burn(Some(account).into(), burn_amount_2, true));
+		System::assert_last_event(RuntimeEvent::Balances(Event::Burned {
+			who: account,
+			amount: burn_amount_2,
+		}));
+		assert_eq!(Balances::total_issuance(), init_issuance - burn_amount_1 - burn_amount_2);
+		assert!(Balances::total_balance(&account).is_zero());
+	});
+}
