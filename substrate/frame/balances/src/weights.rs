@@ -57,6 +57,7 @@ pub trait WeightInfo {
 	fn transfer_all() -> Weight;
 	fn force_unreserve() -> Weight;
 	fn upgrade_accounts(u: u32, ) -> Weight;
+	fn burn() -> Weight;
 }
 
 /// Weights for pallet_balances using the Substrate node and recommended hardware.
@@ -154,6 +155,13 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 			.saturating_add(T::DbWeight::get().writes((1_u64).saturating_mul(u.into())))
 			.saturating_add(Weight::from_parts(0, 2603).saturating_mul(u.into()))
 	}
+	fn burn() -> Weight {
+		// Proof Size summary in bytes:
+		//  Measured:  `0`
+		//  Estimated: `0`
+		// Minimum execution time: 30_151_000 picoseconds.
+		Weight::from_parts(30_968_000, 0)
+	}
 }
 
 // For backwards compatibility and tests.
@@ -249,5 +257,12 @@ impl WeightInfo for () {
 			.saturating_add(RocksDbWeight::get().reads((1_u64).saturating_mul(u.into())))
 			.saturating_add(RocksDbWeight::get().writes((1_u64).saturating_mul(u.into())))
 			.saturating_add(Weight::from_parts(0, 2603).saturating_mul(u.into()))
+	}
+	fn burn() -> Weight {
+		// Proof Size summary in bytes:
+		//  Measured:  `0`
+		//  Estimated: `0`
+		// Minimum execution time: 30_151_000 picoseconds.
+		Weight::from_parts(30_968_000, 0)
 	}
 }

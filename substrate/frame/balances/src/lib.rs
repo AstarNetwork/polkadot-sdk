@@ -165,7 +165,7 @@ mod tests;
 mod types;
 pub mod weights;
 
-use codec::{Codec, MaxEncodedLen};
+use parity_scale_codec::{Codec, MaxEncodedLen};
 use frame_support::{
 	ensure,
 	pallet_prelude::DispatchResult,
@@ -743,6 +743,23 @@ pub mod pallet {
 			}
 
 			Self::deposit_event(Event::BalanceSet { who, free: new_free });
+			Ok(())
+		}
+
+		#[pallet::call_index(10)]
+		#[pallet::weight(T::WeightInfo::burn())]
+		pub fn burn(
+			origin: OriginFor<T>,
+			#[pallet::compact] value: T::Balance,
+			_ignorable: bool,
+		) -> DispatchResult {
+			let source = ensure_signed(origin)?;
+			<Self as fungible::Mutate<_>>::burn_from(
+				&source,
+				value,
+				Precision::Exact,
+				Polite,
+			)?;
 			Ok(())
 		}
 	}

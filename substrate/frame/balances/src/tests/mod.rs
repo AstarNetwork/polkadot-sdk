@@ -19,8 +19,8 @@
 
 #![cfg(test)]
 
-use crate::{self as pallet_balances, AccountData, Config, CreditOf, Error, Pallet};
-use codec::{Decode, Encode, MaxEncodedLen};
+use crate::{self as pallet_balances, AccountData, Config, CreditOf, Error, Event, Pallet};
+use parity_scale_codec::{Decode, Encode, MaxEncodedLen};
 use frame_support::{
 	assert_err, assert_noop, assert_ok, assert_storage_noop,
 	dispatch::{DispatchInfo, GetDispatchInfo},
