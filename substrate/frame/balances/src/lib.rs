@@ -163,7 +163,6 @@ mod tests;
 mod types;
 pub mod weights;
 
-use codec::{Codec, MaxEncodedLen};
 use frame_support::{
 	ensure,
 	pallet_prelude::DispatchResult,
@@ -180,6 +179,7 @@ use frame_support::{
 };
 use frame_system as system;
 pub use impl_currency::{NegativeImbalance, PositiveImbalance};
+use parity_scale_codec::{Codec, MaxEncodedLen};
 use scale_info::TypeInfo;
 use sp_runtime::{
 	traits::{
@@ -686,7 +686,7 @@ pub mod pallet {
 		) -> DispatchResultWithPostInfo {
 			ensure_signed(origin)?;
 			if who.is_empty() {
-				return Ok(Pays::Yes.into())
+				return Ok(Pays::Yes.into());
 			}
 			let mut upgrade_count = 0;
 			for i in &who {
@@ -772,6 +772,18 @@ pub mod pallet {
 
 			Ok(())
 		}
+
+		#[pallet::call_index(10)]
+		#[pallet::weight(T::WeightInfo::burn())]
+		pub fn burn(
+			origin: OriginFor<T>,
+			#[pallet::compact] value: T::Balance,
+			_ignorable: bool,
+		) -> DispatchResult {
+			let source = ensure_signed(origin)?;
+			<Self as fungible::Mutate<_>>::burn_from(&source, value, Precision::Exact, Polite)?;
+			Ok(())
+		}
 	}
 
 	impl<T: Config<I>, I: 'static> Pallet<T, I> {
@@ -784,7 +796,7 @@ pub mod pallet {
 		pub fn ensure_upgraded(who: &T::AccountId) -> bool {
 			let mut a = T::AccountStore::get(who);
 			if a.flags.is_new_logic() {
-				return false
+				return false;
 			}
 			a.flags.set_new_logic();
 			if !a.reserved.is_zero() && a.frozen.is_zero() {
@@ -808,7 +820,7 @@ pub mod pallet {
 				Ok(())
 			});
 			Self::deposit_event(Event::Upgraded { who: who.clone() });
-			return true
+			return true;
 		}
 
 		/// Get the free balance of an account.
@@ -1114,7 +1126,7 @@ pub mod pallet {
 			status: Status,
 		) -> Result<T::Balance, DispatchError> {
 			if value.is_zero() {
-				return Ok(Zero::zero())
+				return Ok(Zero::zero());
 			}
 
 			let max = <Self as fungible::InspectHold<_>>::reducible_total_balance_on_hold(
@@ -1129,7 +1141,7 @@ pub mod pallet {
 				return match status {
 					Status::Free => Ok(actual.saturating_sub(Self::unreserve(slashed, actual))),
 					Status::Reserved => Ok(actual),
-				}
+				};
 			}
 
 			let ((_, maybe_dust_1), maybe_dust_2) = Self::try_mutate_account(
@@ -1138,16 +1150,18 @@ pub mod pallet {
 					ensure!(!is_new, Error::<T, I>::DeadAccount);
 					Self::try_mutate_account(slashed, |from_account, _| -> DispatchResult {
 						match status {
-							Status::Free =>
+							Status::Free => {
 								to_account.free = to_account
 									.free
 									.checked_add(&actual)
-									.ok_or(ArithmeticError::Overflow)?,
-							Status::Reserved =>
+									.ok_or(ArithmeticError::Overflow)?
+							},
+							Status::Reserved => {
 								to_account.reserved = to_account
 									.reserved
 									.checked_add(&actual)
-									.ok_or(ArithmeticError::Overflow)?,
+									.ok_or(ArithmeticError::Overflow)?
+							},
 						}
 						from_account.reserved.saturating_reduce(actual);
 						Ok(())
