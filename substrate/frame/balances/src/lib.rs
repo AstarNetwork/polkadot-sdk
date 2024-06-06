@@ -163,7 +163,7 @@ mod tests;
 mod types;
 pub mod weights;
 
-use parity_scale_codec::{Codec, MaxEncodedLen};
+use codec::{Codec, MaxEncodedLen};
 use frame_support::{
 	ensure,
 	pallet_prelude::DispatchResult,

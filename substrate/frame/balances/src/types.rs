@@ -18,7 +18,7 @@
 //! Types used in the pallet.
 
 use crate::{Config, CreditOf, Event, Pallet};
-use parity_scale_codec::{Decode, Encode, MaxEncodedLen};
+use codec::{Decode, Encode, MaxEncodedLen};
 use core::ops::BitOr;
 use frame_support::traits::{Imbalance, LockIdentifier, OnUnbalanced, WithdrawReasons};
 use scale_info::TypeInfo;
