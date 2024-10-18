@@ -42,3 +42,6 @@ General spending/proposal protocol:
 ## Release
 
 polkadot v1.15.0
+- `propose_spend` - Make a spending proposal and stake the required deposit.
+- `reject_proposal` - Reject a proposal, slashing the deposit.
+- `approve_proposal` - Accept the proposal, returning the deposit.

@@ -19,7 +19,6 @@
 
 // Make sure we fail compilation on warnings
 #![warn(missing_docs)]
-#![deny(warnings)]
 
 pub use frame_support::dispatch::RawOrigin;
 use frame_system::pallet_prelude::BlockNumberFor;

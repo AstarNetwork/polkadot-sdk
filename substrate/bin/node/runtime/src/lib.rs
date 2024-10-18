@@ -1215,6 +1215,8 @@ impl pallet_membership::Config<pallet_membership::Instance1> for Runtime {
 }
 
 parameter_types! {
+	pub const ProposalBond: Permill = Permill::from_percent(5);
+	pub const ProposalBondMinimum: Balance = 1 * DOLLARS;
 	pub const SpendPeriod: BlockNumber = 1 * DAYS;
 	pub const Burn: Permill = Permill::from_percent(50);
 	pub const TipCountdown: BlockNumber = 1 * DAYS;
@@ -1241,6 +1243,9 @@ impl pallet_treasury::Config for Runtime {
 	>;
 	type RuntimeEvent = RuntimeEvent;
 	type OnSlash = ();
+	type ProposalBond = ProposalBond;
+	type ProposalBondMinimum = ProposalBondMinimum;
+	type ProposalBondMaximum = ();
 	type SpendPeriod = SpendPeriod;
 	type Burn = Burn;
 	type BurnDestination = ();
