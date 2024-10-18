@@ -23,6 +23,7 @@
 //!
 //! By default, the panic handler aborts the process by calling [`std::process::exit`]. This can
 //! temporarily be disabled by using an [`AbortGuard`].
+#![allow(deprecated)]
 
 use backtrace::Backtrace;
 use regex::Regex;
