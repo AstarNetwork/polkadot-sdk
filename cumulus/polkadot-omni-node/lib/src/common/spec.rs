@@ -50,7 +50,7 @@ use sc_transaction_pool_api::OffchainTransactionPoolFactory;
 use sp_keystore::KeystorePtr;
 use std::{future::Future, pin::Pin, sync::Arc, time::Duration};
 
-pub(crate) trait BuildImportQueue<
+pub trait BuildImportQueue<
 	Block: BlockT,
 	RuntimeApi,
 	BlockImport: sc_consensus::BlockImport<Block>,
@@ -65,7 +65,7 @@ pub(crate) trait BuildImportQueue<
 	) -> sc_service::error::Result<DefaultImportQueue<Block>>;
 }
 
-pub(crate) trait StartConsensus<Block: BlockT, RuntimeApi, BI, BIAuxiliaryData>
+pub trait StartConsensus<Block: BlockT, RuntimeApi, BI, BIAuxiliaryData>
 where
 	RuntimeApi: ConstructNodeRuntimeApi<Block, ParachainClient<Block, RuntimeApi>>,
 {
@@ -104,7 +104,7 @@ fn warn_if_slow_hardware(hwbench: &sc_sysinfo::HwBench) {
 	}
 }
 
-pub(crate) trait InitBlockImport<Block: BlockT, RuntimeApi> {
+pub trait InitBlockImport<Block: BlockT, RuntimeApi> {
 	type BlockImport: sc_consensus::BlockImport<Block> + Clone + Send + Sync;
 	type BlockImportAuxiliaryData;
 
@@ -113,7 +113,7 @@ pub(crate) trait InitBlockImport<Block: BlockT, RuntimeApi> {
 	) -> sc_service::error::Result<(Self::BlockImport, Self::BlockImportAuxiliaryData)>;
 }
 
-pub(crate) struct ClientBlockImport;
+pub struct ClientBlockImport;
 
 impl<Block: BlockT, RuntimeApi> InitBlockImport<Block, RuntimeApi> for ClientBlockImport
 where
@@ -129,7 +129,7 @@ where
 	}
 }
 
-pub(crate) trait BaseNodeSpec {
+pub trait BaseNodeSpec {
 	type Block: NodeBlock;
 
 	type RuntimeApi: ConstructNodeRuntimeApi<
@@ -236,7 +236,7 @@ pub(crate) trait BaseNodeSpec {
 	}
 }
 
-pub(crate) trait NodeSpec: BaseNodeSpec {
+pub trait NodeSpec: BaseNodeSpec {
 	type BuildRpcExtensions: BuildRpcExtensions<
 		ParachainClient<Self::Block, Self::RuntimeApi>,
 		ParachainBackend<Self::Block>,
@@ -496,7 +496,7 @@ pub(crate) trait NodeSpec: BaseNodeSpec {
 	}
 }
 
-pub(crate) trait DynNodeSpec: NodeCommandRunner {
+pub trait DynNodeSpec: NodeCommandRunner {
 	fn start_node(
 		self: Box<Self>,
 		parachain_config: Configuration,

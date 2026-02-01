@@ -27,4 +27,9 @@ mod nodes;
 pub use cli::CliConfig;
 pub use command::{run, run_with_custom_cli, RunConfig};
 pub use common::{chain_spec, runtime};
+pub use common::rpc::{BuildParachainRpcExtensions, BuildRpcExtensions, RpcExtension};
+pub use common::spec::{
+    BaseNodeSpec, BuildImportQueue, ClientBlockImport, DynNodeSpec,
+    InitBlockImport, NodeSpec, StartConsensus,
+};
 pub use nodes::NODE_VERSION;
