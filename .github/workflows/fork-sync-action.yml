@@ -6,8 +6,8 @@
 
 name: Sync the forked repo with the upstream
 on:
-  schedule:
-    - cron: "0 0/4 * * *"
+  # schedule:
+  #  - cron: "0 0/4 * * *"
   workflow_dispatch:
 
 jobs:
