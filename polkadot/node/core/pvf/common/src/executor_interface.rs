@@ -170,6 +170,11 @@ pub fn params_to_wasmtime_semantics(par: &ExecutorParams) -> (Semantics, Determi
 			ExecutorParam::PrecheckingMaxMemory(_) |
 			ExecutorParam::PvfPrepTimeout(_, _) |
 			ExecutorParam::PvfExecTimeout(_, _) => (), /* Not used here */
+			// Astar hotfix: accepted for decoding only. Wiring the optional ECC host functions
+			// into the executor is out of scope here; this node runs as a parachain collator,
+			// where candidate-validation is a `DummySubsystem` and this function is never
+			// reached. Do NOT run this binary as a relay-chain validator.
+			ExecutorParam::EnabledHostFunction(_) => (),
 		}
 	}
 	sem.deterministic_stack_limit = Some(stack_limit.clone());
@@ -398,6 +403,7 @@ mod tests {
 			PvfPrepTimeout(_, _) => true,
 			PvfExecTimeout(_, _) => true,
 			WasmExtBulkMemory => true,
+			EnabledHostFunction(_) => true,
 		};
 
 		// A minimal module with memory and an exported `validate_block` function.
