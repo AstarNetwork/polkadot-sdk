@@ -549,11 +549,29 @@ where
 			if !continues_known_fork && !is_major_syncing {
 				let current = number.min(best_queued_number);
 				peer.common_number = peer.common_number.min(self.client.info().finalized_number);
-				peer.state = PeerSyncState::AncestorSearch {
-					current,
-					start: best_queued_number,
-					state: AncestorSearchState::ExponentialBackoff(One::one()),
-				};
+				let old_state = std::mem::replace(
+					&mut peer.state,
+					PeerSyncState::AncestorSearch {
+						current,
+						start: best_queued_number,
+						state: AncestorSearchState::ExponentialBackoff(One::one()),
+					},
+				);
+
+				// Release the replaced download so another peer can pick it up.
+				match old_state {
+					PeerSyncState::DownloadingNew(_) => self.blocks.clear_peer_download(&peer_id),
+					PeerSyncState::DownloadingGap(_) => {
+						if let Some(gap_sync) = &mut self.gap_sync {
+							gap_sync.blocks.clear_peer_download(&peer_id);
+						}
+					},
+					PeerSyncState::DownloadingJustification(_) => {
+						self.extra_justifications.peer_disconnected(&peer_id);
+					},
+					_ => {},
+				}
+				self.allowed_requests.set_all();
 
 				let request = ancestry_request::<B>(current);
 				let action = self.create_block_request_action(peer_id, request);
